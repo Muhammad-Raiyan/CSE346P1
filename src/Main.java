@@ -1,34 +1,31 @@
-import java.util.Random;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.text.DecimalFormat;
 
 public class Main {
-    static class Slot{
-        double p;
-        Random r;
-        Slot(double p){
-            this.p = p;
-             r = new Random();
-        }
-
-        boolean simulate(){
-            double input1 = r.nextDouble();
-            double input2 = r.nextDouble();
-            double input3 = r.nextDouble();
-            double input4 = r.nextDouble();
-            return (input1 <= p) || (input2 <= p) || (input3 <= p) || (input4 <= p);
-        }
-    }
-    public static void main(String[] args) {
-        int NUMBER_OF_SIMULATIONS = 100;
-
+    public static void main(String[] args) throws FileNotFoundException {
+        DecimalFormat df2 = new DecimalFormat(".##");
+        PrintWriter pw = new PrintWriter(new File("data.csv"));
+        String ColumnNamesList = "P,A,C\n";
+        pw.write(ColumnNamesList);
+        int NUMBER_OF_SIMULATIONS = 10000;
         for(double p = 0.1; p < 1.0; p+=0.01){
             Slot s = new Slot(p);
-            int throughput = 0;
+            int throughputC = 0;
+            int throughputA = 0;
+
             for(int i=0; i< NUMBER_OF_SIMULATIONS; i++){
-                if(s.simulate()) throughput++;
+                if(s.simulateC()) throughputC++;
             }
-            System.out.println("P: " +  (double)throughput/NUMBER_OF_SIMULATIONS);
 
+            for(int i=0; i< NUMBER_OF_SIMULATIONS; i++){
+                if(s.simulateA()) throughputA++;
+            }
+           pw.write(df2.format(p) + "," + (double)throughputA/NUMBER_OF_SIMULATIONS
+                   + "," + (double)throughputC/NUMBER_OF_SIMULATIONS + "\n");
         }
-
+        pw.close();
+        System.out.println("Finished Simulation");
     }
 }
